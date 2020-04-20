@@ -11,9 +11,9 @@ use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 use function dirname;
-use function Safe\file_get_contents;
-use function Safe\file_put_contents;
-use function Safe\sprintf;
+use function file_get_contents;
+use function file_put_contents;
+use function sprintf;
 use const DIRECTORY_SEPARATOR;
 
 final class BinAutoloadPathUpdater implements PluginInterface, EventSubscriberInterface
@@ -39,13 +39,23 @@ final class BinAutoloadPathUpdater implements PluginInterface, EventSubscriberIn
         $vendorDir = $event->getComposer()->getConfig()->get('vendor-dir');
         $autoloaderPath = $event->getComposer()->getConfig()->get('vendor-dir') . DIRECTORY_SEPARATOR . 'autoload.php';
         foreach ($event->getcomposer()->getRepositoryManager()->getLocalRepository()->getCanonicalPackages() as $package) {
-            if (array_key_exists('wyrihaximus', $package->getExtra())) {
-                if (array_key_exists('bin-autoload-path-update', $package->getExtra()['wyrihaximus'])) {
-                    foreach ($package->getExtra()['wyrihaximus']['bin-autoload-path-update'] as $binPath) {
-                        self::updateBinPath(self::getVendorPath($vendorDir, $package) . $binPath, $autoloaderPath);
-                    }
-                }
-            }
+            self::updatePackage($package, $vendorDir, $autoloaderPath);
+        }
+        self::updatePackage($event->getComposer()->getPackage(), $vendorDir, $autoloaderPath);
+    }
+
+    private static function updatePackage(PackageInterface $package, string $vendorDir, string $autoloaderPath): void
+    {
+        if (!array_key_exists('wyrihaximus', $package->getExtra())) {
+            return;
+        }
+
+        if (!array_key_exists('bin-autoload-path-update', $package->getExtra()['wyrihaximus'])) {
+            return;
+        }
+
+        foreach ($package->getExtra()['wyrihaximus']['bin-autoload-path-update'] as $binPath) {
+            self::updateBinPath(self::getVendorPath($vendorDir, $package) . $binPath, $autoloaderPath);
         }
     }
 

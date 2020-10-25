@@ -31,6 +31,16 @@ final class BinAutoloadPathUpdater implements PluginInterface, EventSubscriberIn
         // does nothing, see getSubscribedEvents() instead.
     }
 
+    public function deactivate(Composer $composer, IOInterface $io): void
+    {
+        // does nothing, see getSubscribedEvents() instead.
+    }
+
+    public function uninstall(Composer $composer, IOInterface $io): void
+    {
+        // does nothing, see getSubscribedEvents() instead.
+    }
+
     /**
      * Called before every dump autoload, generates a fresh PHP class.
      */

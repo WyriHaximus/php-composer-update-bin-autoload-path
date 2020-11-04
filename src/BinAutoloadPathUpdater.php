@@ -47,7 +47,8 @@ final class BinAutoloadPathUpdater implements PluginInterface, EventSubscriberIn
     public static function updateBinPaths(Event $event): void
     {
         $vendorDir = $event->getComposer()->getConfig()->get('vendor-dir');
-        $autoloaderPath = $event->getComposer()->getConfig()->get('vendor-dir') . DIRECTORY_SEPARATOR . 'autoload.php';
+        $autoloaderPath = $vendorDir . DIRECTORY_SEPARATOR . 'autoload.php';
+
         foreach ($event->getcomposer()->getRepositoryManager()->getLocalRepository()->getCanonicalPackages() as $package) {
             self::updatePackage($package, $vendorDir, $autoloaderPath);
         }

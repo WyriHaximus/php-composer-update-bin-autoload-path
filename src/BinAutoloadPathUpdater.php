@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\Composer;
 
@@ -10,10 +12,13 @@ use Composer\Package\RootPackageInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
+
+use function array_key_exists;
 use function dirname;
-use function file_get_contents;
-use function file_put_contents;
-use function sprintf;
+use function Safe\file_get_contents;
+use function Safe\file_put_contents;
+use function Safe\sprintf;
+
 use const DIRECTORY_SEPARATOR;
 
 final class BinAutoloadPathUpdater implements PluginInterface, EventSubscriberInterface
@@ -46,22 +51,23 @@ final class BinAutoloadPathUpdater implements PluginInterface, EventSubscriberIn
      */
     public static function updateBinPaths(Event $event): void
     {
-        $vendorDir = $event->getComposer()->getConfig()->get('vendor-dir');
+        $vendorDir      = $event->getComposer()->getConfig()->get('vendor-dir');
         $autoloaderPath = $vendorDir . DIRECTORY_SEPARATOR . 'autoload.php';
 
-        foreach ($event->getcomposer()->getRepositoryManager()->getLocalRepository()->getCanonicalPackages() as $package) {
+        foreach ($event->getComposer()->getRepositoryManager()->getLocalRepository()->getCanonicalPackages() as $package) {
             self::updatePackage($package, $vendorDir, $autoloaderPath);
         }
+
         self::updatePackage($event->getComposer()->getPackage(), $vendorDir, $autoloaderPath);
     }
 
     private static function updatePackage(PackageInterface $package, string $vendorDir, string $autoloaderPath): void
     {
-        if (!array_key_exists('wyrihaximus', $package->getExtra())) {
+        if (! array_key_exists('wyrihaximus', $package->getExtra())) {
             return;
         }
 
-        if (!array_key_exists('bin-autoload-path-update', $package->getExtra()['wyrihaximus'])) {
+        if (! array_key_exists('bin-autoload-path-update', $package->getExtra()['wyrihaximus'])) {
             return;
         }
 
@@ -83,7 +89,7 @@ final class BinAutoloadPathUpdater implements PluginInterface, EventSubscriberIn
         );
     }
 
-    public static function getVendorPath(string $vendorDir, PackageInterface $package): string
+    private static function getVendorPath(string $vendorDir, PackageInterface $package): string
     {
         if ($package instanceof RootPackageInterface) {
             return dirname($vendorDir) . DIRECTORY_SEPARATOR;

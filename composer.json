@@ -8,7 +8,7 @@
         "composer-plugin-api": "^2"
     },
     "require-dev": {
-        "wyrihaximus/test-utilities": "^2.9"
+        "wyrihaximus/test-utilities": "^3"
     },
     "config": {
         "platform": {

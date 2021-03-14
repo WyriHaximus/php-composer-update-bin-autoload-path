@@ -15,9 +15,9 @@ use Composer\Script\ScriptEvents;
 
 use function array_key_exists;
 use function dirname;
+use function file_get_contents;
 use function file_put_contents;
-use function Safe\file_get_contents;
-use function Safe\sprintf;
+use function sprintf;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -81,6 +81,7 @@ final class BinAutoloadPathUpdater implements PluginInterface, EventSubscriberIn
         file_put_contents(
             $binPath,
             sprintf(
+                /** @phpstan-ignore-next-line */
                 file_get_contents(
                     $binPath . '.source'
                 ),

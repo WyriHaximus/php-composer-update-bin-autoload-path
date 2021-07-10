@@ -10,21 +10,29 @@
     },
     "mutators": {
         "@default": true,
-        "ArrayItemRemoval": false,
-        "CastString": false,
-        "Identical": false,
-        "MethodCallRemoval": false,
-        "Continue_": false,
-        "FunctionCallRemoval": false,
-        "InstanceOf_": false,
-        "Minus": false,
-        "RoundingFamily": false,
-        "ArrayOneItem": false,
-        "Foreach_": false,
-        "LogicalOr": false,
-        "LogicalNot": {
+        "ArrayItemRemoval": {
             "ignore": [
-                "WyriHaximus\\Broadcast\\Composer\\Installer::findEventListeners"
+                "WyriHaximus\\Composer\\BinAutoloadPathUpdater::getSubscribedEvents"
+            ]
+        },
+        "UnwrapRtrim": {
+            "ignore": [
+                "WyriHaximus\\Composer\\BinAutoloadPathUpdater::getRelativePath"
+            ]
+        },
+        "UnwrapStrReplace": {
+            "ignore": [
+                "WyriHaximus\\Composer\\BinAutoloadPathUpdater::getRelativePath"
+            ]
+        },
+        "GreaterThanOrEqualTo": {
+            "ignore": [
+                "WyriHaximus\\Composer\\BinAutoloadPathUpdater::getRelativePath"
+            ]
+        },
+        "Multiplication": {
+            "ignore": [
+                "WyriHaximus\\Composer\\BinAutoloadPathUpdater::getRelativePath"
             ]
         }
     }

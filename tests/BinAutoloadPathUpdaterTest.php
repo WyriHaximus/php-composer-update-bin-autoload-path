@@ -79,8 +79,8 @@ final class BinAutoloadPathUpdaterTest extends TestCase
 
         self::assertFileExists($tmpDir . 'bin/app-name');
         self::assertFileExists($tmpDir . 'vendor/wyrihaximus/b/bin/app-b-name');
-        self::assertSame($tmpDir . 'vendor/autoload.php', file_get_contents($tmpDir . 'bin/app-name'));
-        self::assertSame($tmpDir . 'vendor/autoload.php', file_get_contents($tmpDir . 'vendor/wyrihaximus/b/bin/app-b-name'));
+        self::assertSame('../vendor/autoload.php', file_get_contents($tmpDir . 'bin/app-name'));
+        self::assertSame('../../../autoload.php', file_get_contents($tmpDir . 'vendor/wyrihaximus/b/bin/app-b-name'));
     }
 
     /**

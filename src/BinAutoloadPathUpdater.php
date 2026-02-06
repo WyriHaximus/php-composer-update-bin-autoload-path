@@ -14,15 +14,27 @@ use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 
 use function array_key_exists;
+use function array_pad;
+use function array_shift;
+use function count;
 use function dirname;
+use function explode;
 use function file_get_contents;
 use function file_put_contents;
+use function implode;
+use function is_dir;
+use function rtrim;
 use function sprintf;
+use function str_replace;
 
 use const DIRECTORY_SEPARATOR;
 
 final class BinAutoloadPathUpdater implements PluginInterface, EventSubscriberInterface
 {
+    private const MINUS_ONE = -1;
+    private const ZERO      = 0;
+    private const ONE       = 1;
+
     /**
      * @return array<string, string>
      */
@@ -72,7 +84,9 @@ final class BinAutoloadPathUpdater implements PluginInterface, EventSubscriberIn
         }
 
         foreach ($package->getExtra()['wyrihaximus']['bin-autoload-path-update'] as $binPath) {
-            self::updateBinPath(self::getVendorPath($vendorDir, $package) . $binPath, $autoloaderPath);
+            $vendorPath             = self::getVendorPath($vendorDir, $package);
+            $relativeAutoloaderPath = self::getRelativePath(dirname($vendorPath . $binPath), $autoloaderPath);
+            self::updateBinPath($vendorPath . $binPath, $relativeAutoloaderPath);
         }
     }
 
@@ -97,5 +111,39 @@ final class BinAutoloadPathUpdater implements PluginInterface, EventSubscriberIn
         }
 
         return $vendorDir . DIRECTORY_SEPARATOR . $package->getName() . DIRECTORY_SEPARATOR;
+    }
+
+    private static function getRelativePath(string $from, string $to): string
+    {
+        // some compatibility fixes for Windows paths
+        $from = is_dir($from) ? rtrim($from, '\/') . '/' : $from;
+        $to   = is_dir($to)   ? rtrim($to, '\/') . '/'   : $to;
+        $from = str_replace('\\', '/', $from);
+        $to   = str_replace('\\', '/', $to);
+
+        $from    = explode('/', $from);
+        $to      = explode('/', $to);
+        $relPath = $to;
+
+        foreach ($from as $depth => $dir) {
+            // find first non-matching dir
+            if ($dir === $to[$depth]) {
+                // ignore this directory
+                array_shift($relPath);
+            } else {
+                // get number of remaining dirs to $from
+                $remaining = count($from) - $depth;
+                if ($remaining >= self::ZERO) {
+                    // add traversals up to first matching dir
+                    $padLength = (count($relPath) + $remaining - self::ONE) * self::MINUS_ONE;
+                    $relPath   = array_pad($relPath, $padLength, '..');
+                    break;
+                }
+
+                $relPath[self::ZERO] = './' . $relPath[self::ZERO];
+            }
+        }
+
+        return implode('/', $relPath);
     }
 }
